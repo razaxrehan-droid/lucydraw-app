@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <style>
+        body { background: #0d1117; color: #fff; font-family: sans-serif; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        button { padding: 10px 15px; margin-right: 8px; border-radius: 6px; border: none; font-weight: bold; cursor: pointer; }
+        .draw-btn { background: #f59e0b; }
+        .reset-btn { background: #ef4444; color: #fff; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #161b22; }
+        th, td { padding: 10px; border: 1px solid #30363d; text-align: left; }
+        th { color: #10b981; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Lucky Draw Admin Panel</h1>
+    <p>Total Entries: <strong id="count" style="color:#10b981;">0</strong></p><br>
+
+    <button class="draw-btn" onclick="drawWinner()">🎯 Draw Random Winner</button>
+    <button class="reset-btn" onclick="resetDb()">⚠️ Reset All Data</button>
+
+    <div id="winner" style="margin:20px 0; font-size: 18px; color:#f59e0b;"></div>
+
+    <table>
+        <thead>
+            <tr><th>Ticket #</th><th>Name</th><th>Phone</th><th>TRX ID</th></tr>
+        </thead>
+        <tbody id="list"></tbody>
+    </table>
+</div>
+
+<script>
+    const SECRET = prompt("Admin Password:", "admin123");
+
+    async function load() {
+        const res = await fetch('/api/admin/entries', { headers: { 'x-admin-secret': SECRET } });
+        const data = await res.json();
+        if(!data.success) return alert(data.message);
+
+        document.getElementById('count').innerText = data.count;
+        const list = document.getElementById('list');
+        list.innerHTML = data.entries.map(e => 
+            `<tr><td>#${e.ticketNumber}</td><td>${e.name}</td><td>${e.phone}</td><td>${e.transactionId}</td></tr>`
+        ).join('');
+    }
+
+    async function drawWinner() {
+        const res = await fetch('/api/admin/draw-winner', { method: 'POST', headers: { 'x-admin-secret': SECRET } });
+        const data = await res.json();
+        if(data.success) {
+            document.getElementById('winner').innerHTML = `🎉 WINNER: Ticket #${data.winner.ticketNumber} | ${data.winner.name} (${data.winner.phone}) | TRX: ${data.winner.transactionId}`;
+        } else {
+            alert(data.message);
+        }
+    }
+
+    async function resetDb() {
+        if(!confirm("Sub data clear kar dein?")) return;
+        await fetch('/api/admin/reset', { method: 'DELETE', headers: { 'x-admin-secret': SECRET } });
+        load();
+    }
+
+    load();
+</script>
+
+</body>
+</html>

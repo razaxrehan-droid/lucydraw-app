@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rs. 1 Lucky Draw</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
+        body { background: #0d1117; color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 15px; }
+        .card { width: 100%; max-width: 400px; background: #161b22; border: 1px solid #30363d; border-radius: 16px; padding: 20px; text-align: center; }
+        h2 { color: #10b981; margin-bottom: 10px; }
+        .payment-box { background: #21262d; border: 1px dashed #10b981; padding: 12px; border-radius: 10px; margin: 15px 0; text-align: left; font-size: 13px; }
+        .wa-box { background: rgba(37,211,102,0.1); border: 1px solid #25d366; padding: 10px; border-radius: 10px; margin-bottom: 15px; }
+        .wa-btn { display: block; background: #25d366; color: #000; text-decoration: none; padding: 8px; border-radius: 6px; font-weight: bold; font-size: 13px; margin-top: 5px; }
+        input { width: 100%; padding: 12px; margin: 6px 0; border-radius: 8px; border: 1px solid #30363d; background: #0d1117; color: #fff; }
+        button { width: 100%; padding: 12px; background: #10b981; color: #fff; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>iPhone 15 Pro - Rs. 1 Game</h2>
+
+    <div class="payment-box">
+        <strong>Easypaisa / JazzCash Payment:</strong><br>
+        Number: <code style="color:#10b981;">0310-6840170</code><br>
+        Account Name: <code style="color:#10b981;">Muhammad Raza</code><br>
+        <small style="color: #8b949e;">Rs. 1 bhejne ke baad TRX ID niche enter karein.</small>
+    </div>
+
+    <div class="wa-box">
+        <p style="font-size: 12px;">📢 Draw date ki updates WhatsApp Channel par milengi!</p>
+        <a href="https://whatsapp.com/channel/0029VbDRMPuGzzKNKpJvtN1M" target="_blank" class="wa-btn">📲 Join WhatsApp Channel</a>
+    </div>
+
+    <input type="text" id="name" placeholder="Apka Full Name" />
+    <input type="text" id="phone" placeholder="Mobile Number (03XX-XXXXXXX)" />
+    <input type="text" id="trxId" placeholder="TRX ID (e.g. 238128312)" />
+    
+    <button onclick="submitEntry()">Get Entry Ticket (Rs. 1)</button>
+</div>
+
+<script>
+    async function submitEntry() {
+        const name = document.getElementById('name').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+        const transactionId = document.getElementById('trxId').value.trim();
+
+        if (!name || !phone || !transactionId) return alert('Tamam details fill karein!');
+
+        const res = await fetch('/api/buy-ticket', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, phone, transactionId })
+        });
+
+        const data = await res.json();
+        if (data.success) {
+            alert(`🎉 Success! Apka Ticket Number hai: #${data.ticketNumber}\n\nUpdates ke liye WhatsApp channel join karein!`);
+            location.reload();
+        } else {
+            alert(`❌ Error: ${data.message}`);
+        }
+    }
+</script>
+
+</body>
+</html>
